@@ -9,6 +9,8 @@ export default function Header() {
     const {data , setData} = useContext(UserContext);
     const [name , setName] = useState('');
     const [vote , setVote] = useState('');
+    const [startDate , setStartDate] = useState('');
+    const [endDate , setEndDate] = useState('');
 
     function changeStatus(e) {
         setType(e.target.value);
@@ -89,6 +91,35 @@ export default function Header() {
         )
     }
 
+    function minDate(e) {
+        const date = new Date();
+        const newDate = e.target.value;
+        const dates = date.toISOString().slice(0, 10).replace("2026" , newDate);
+        setStartDate(dates);
+    }
+
+    function maxDate(e) {
+        const date = new Date();
+        const newDate = e.target.value;
+        const dates = date.toISOString().slice(0, 10).replace("2026" , newDate);
+        setEndDate(dates);
+    }
+
+    useEffect(
+        () => {
+            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&primary_release_date.gte=${startDate}&primary_release_date.lte=${endDate}`)
+            .then(
+                res => {
+                    if ( res.status == 200 ) {
+                        setData(res.data.results)
+                    }
+                }
+            )
+            .catch(
+                err => console.log(err.message)
+            )
+
+         } , [ startDate , endDate ] )
 
     return (
         <>
@@ -104,8 +135,8 @@ export default function Header() {
                             <input onChange={searchFilmbyTitle } type="text" placeholder="search" id="search"/>
                         </div>
                         <div className="row1">
-                            <input type="number" placeholder="min" id="min"/>
-                            <input type="number" placeholder="max" id="max"/>
+                            <input type="number" onChange={minDate} placeholder="min" id="min"/>
+                            <input type="number" onChange={maxDate} placeholder="max" id="max"/>
                         </div>
                         <div className="row1">
                             <input onChange={searchByScore} type="number" maxLength={0} min={6} max={10} placeholder="score" id="score"/>
