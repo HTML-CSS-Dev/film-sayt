@@ -27,16 +27,21 @@ export default function Header() {
             altrnative();
             return
         }
-        
+
+        setName(searchFilm);
+    }
+
+
+    useEffect(
+        () => {
         axios.get(`https://api.themoviedb.org/3/search/movie?api_key=${API_KEY}&query=`+ name).then(
             res => {
-                setName(searchFilm);
                 setData(res.data.results);
             } 
         ).catch(
             err => console.log(err.message)
         );
-    }
+        } , [name]);
 
 
     // search by Score:
@@ -56,11 +61,11 @@ export default function Header() {
         }
 
         alert("please input the scroe between 6 and 10");
-        scoreSearch = "";
+        e.target.value = "";
     }
 
     useEffect( () => {
-        axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=dcea1fd7b3e65d34387ad6de7ef9cc5e&vote_average.gte=` + vote)
+        axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&vote_average.gte=` + vote)
         .then(
             res => {
                 setData(res.data.results);
