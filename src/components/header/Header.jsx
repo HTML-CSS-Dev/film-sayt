@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import Section from "/src/components/section/Section";
 import { UserContext } from "/src/context/UserContext";
 import {API_KEY} from "/src/utils/api.key";
@@ -7,8 +7,8 @@ import {API_KEY} from "/src/utils/api.key";
 export default function Header() {
     const {type , setType} = useContext(UserContext);
     const {data , setData} = useContext(UserContext);
-    const {name , setName} = useContext(UserContext);
-
+    const [name , setName] = useState('');
+    const [vote , setVote] = useState('');
 
     function changeStatus(e) {
         setType(e.target.value);
@@ -20,20 +20,11 @@ export default function Header() {
             e.target.style.background = "#1a1b2c";
     }
 
-    // search system:
+    // search by title
     function searchFilmbyTitle(e) {
         const searchFilm = e.target.value.trim();
         if (searchFilm === "") {
-            axios.get(`https://api.themoviedb.org/3/movie/${type}?api_key=${API_KEY}`).then(
-                res => {
-                    if ( res.status === 200 ) {
-                        setData(res.data.results);
-                    }
-                }
-            ).catch(
-                err => console.log(err.message)
-            )
-
+            altrnative();
             return
         }
         
@@ -46,6 +37,53 @@ export default function Header() {
             err => console.log(err.message)
         );
     }
+
+
+    // search by Score:
+    function searchByScore(e) {
+        const scoreSearch = e.target.value;
+        if ( scoreSearch == "" ) {
+            altrnative();
+            return
+        }
+
+        if ( scoreSearch == '1' )
+            return
+
+        if ( scoreSearch >= 6 && scoreSearch <= 10 ) {
+            setVote(scoreSearch);
+            return
+        }
+
+        alert("please input the scroe between 6 and 10");
+        scoreSearch = "";
+    }
+
+    useEffect( () => {
+        axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=dcea1fd7b3e65d34387ad6de7ef9cc5e&vote_average.gte=` + vote)
+        .then(
+            res => {
+                setData(res.data.results);
+            }
+        )
+        .catch(
+            err => console.log(err.message)
+        )
+    } , [vote]);
+
+
+    function altrnative () {
+        axios.get(`https://api.themoviedb.org/3/movie/${type}?api_key=${API_KEY}`).then(
+                res => {
+                    if ( res.status === 200 ) {
+                        setData(res.data.results);
+                    }
+                }
+            ).catch(
+                err => console.log(err.message)
+        )
+    }
+
 
     return (
         <>
@@ -65,7 +103,7 @@ export default function Header() {
                             <input type="number" placeholder="max" id="max"/>
                         </div>
                         <div className="row1">
-                            <input type="number" placeholder="score" id="score"/>
+                            <input onChange={searchByScore} type="number" maxLength={0} min={6} max={10} placeholder="score" id="score"/>
                         </div>
                       </div>
                 </div>

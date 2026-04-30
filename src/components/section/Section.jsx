@@ -41,7 +41,6 @@ export default function Section() {
             )
         } , [type , count]);
 
-        
     return (
           <div className="container">
         <div className="append">
