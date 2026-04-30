@@ -6,6 +6,7 @@ import {API_KEY} from "/src/utils/api.key";
 export default function Section() {
     const {data , setData} = useContext(UserContext);
     const {type} = useContext(UserContext);
+    const {name} = useContext(UserContext);
     const [count , setCount] = useState(1);
 
     function increment() {
@@ -26,23 +27,10 @@ export default function Section() {
         setCount(c => c - 1)
     }
 
-    // change page with page counter
-    useEffect( () => {
-            axios.get(`https://api.themoviedb.org/3/discover/movie?api_key=${API_KEY}&page=${count}`).then(
-                res => {
-                    if ( res.status === 200 ) {
-                        setData(res.data.results);
-                    }
-                }
-            ).catch(
-                err => console.log(err.message)
-            )
-        } , [count] );
-
-    // change page width type
+    // change page width type and page
     useEffect(
         () => {
-            axios.get(`https://api.themoviedb.org/3/movie/${type}?api_key=${API_KEY}`).then(
+            axios.get(`https://api.themoviedb.org/3/movie/${type}?api_key=${API_KEY}&page=${count}`).then(
                 res => {
                     if ( res.status === 200 ) {
                         setData(res.data.results);
@@ -51,8 +39,9 @@ export default function Section() {
             ).catch(
                 err => console.log(err.message)
             )
-        } , [type]);
+        } , [type , count]);
 
+        
     return (
           <div className="container">
         <div className="append">
